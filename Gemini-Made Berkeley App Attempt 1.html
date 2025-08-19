@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berkeley Welcome Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar for dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a202c; /* gray-900 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* gray-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096; /* gray-600 */
+        }
+        .location-card.active {
+            background-color: #4A5568; /* gray-700 */
+            border-left-color: #63B3ED; /* blue-400 */
+        }
+        .nav-button svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+        .location-card-icon {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white">Berkeley Welcome Guide</h1>
+            <p class="text-lg text-gray-400 mt-2">Your interactive guide to essential spots for a new grad student.</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-gray-800 rounded-xl shadow-lg p-2 mb-8 sticky top-4 z-10">
+            <div id="nav-buttons" class="flex flex-wrap justify-center gap-2">
+                <!-- Buttons will be dynamically inserted here -->
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Pages for each category will be dynamically inserted here -->
+        </main>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const homeAddress = "1636 63rd Street, Berkeley, CA";
+        const guideData = {
+            "Fitness & Gyms": {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-green-400"><path d="M21.582 6.344a1.5 1.5 0 0 0-1.466-1.135L14.63 4.596a3.75 3.75 0 0 0-5.26 0L3.884 5.209A1.5 1.5 0 0 0 2.418 6.344l-1.42 6.116a1.5 1.5 0 0 0 1.043 1.71l3.192 1.063a3.75 3.75 0 0 0 5.26 0l4.484-1.494a3.75 3.75 0 0 0 5.26 0l3.192-1.063a1.5 1.5 0 0 0 1.043-1.71l-1.42-6.116Zm-11.196 8.35a2.25 2.25 0 0 1-3.182 0L4.012 13.63V10.5h3.082l3.292 1.098a2.25 2.25 0 0 1 0 3.182L7.092 15.87l3.292-1.176ZM19.988 13.63l-3.192 1.063a2.25 2.25 0 0 1-3.182 0l-3.292-1.097V10.5h6.474l.192 3.13Z"/></svg>`,
+                locations: [
+                    { name: "Recreational Sports Facility (RSF)", onCampus: true, pricing: "Included in student fees", distanceHome: "~3.0 miles", walkingTime: "~60 min", bikingTime: "~15 min", transitTime: "~25 min", details: { "Why Go": "It's your primary, most convenient, and most cost-effective option as a student.", "Best For": "A comprehensive workout with a huge variety of equipment, pools, courts, and included group fitness classes.", "Good to Know": "Can get very crowded, especially during peak afternoon hours. The Memorial Stadium Fitness Center is a quieter on-campus alternative for weights/cardio." }, mapQuery: "Recreational+Sports+Facility,+2301+Bancroft+Way,+Berkeley,+CA", icon: '🎓' },
+                    { name: "Immortal Fitness", onCampus: false, pricing: "Open Gym: ~$50 - $60 / month", distanceHome: "~2.1 miles", walkingTime: "~40 min", bikingTime: "~11 min", transitTime: "~20 min", details: { "Why Go": "For serious strength training with the flexibility of 24/7 access.", "Best For": "Powerlifting, weightlifting, and anyone who needs to work out at odd hours. It's one of the few local gyms with a punching bag.", "Good to Know": "It's a more intimate, community-focused gym rather than a large commercial facility." }, mapQuery: "Immortal+Fitness,+3089+Telegraph+Ave,+Berkeley,+CA", icon: '💪' },
+                    { name: "Pacific Ring Sports", onCampus: false, pricing: "~$150 - $200 / month", distanceHome: "~2.5 miles", walkingTime: "~50 min", bikingTime: "~13 min", transitTime: "~20 min", details: { "Why Go": "To learn a martial art from highly respected, world-class coaches.", "Best For": "Authentic training in Muay Thai, Boxing, or Brazilian Jiu-Jitsu in a focused, disciplined environment.", "Good to Know": "It's a true 'fighter's gym' but is known for being very welcoming to beginners who are serious about learning." }, mapQuery: "Pacific+Ring+Sports,+488+43rd+St,+Oakland,+CA", icon: '🥊' }
+                ]
+            },
+            "Medical": {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-red-400"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" /></svg>`,
+                locations: [
+                    { name: "University Health Services (Tang Center)", onCampus: true, pricing: "Most services free or low-cost with SHIP", distanceHome: "~2.8 miles", walkingTime: "~55 min", bikingTime: "~14 min", transitTime: "~25 min", details: { "Why Go": "It's your main, comprehensive medical hub for nearly all health and wellness needs.", "Best For": "Primary care, urgent care, mental health counseling (CAPS), and filling prescriptions affordably.", "Good to Know": "Always start here. You'll typically need a referral from a UHS doctor for off-campus specialty care to be fully covered by your student insurance." }, mapQuery: "Tang+Center,+2222+Bancroft+Way,+Berkeley,+CA", icon: '🎓' },
+                    { name: "Carbon Health Urgent Care", onCampus: false, pricing: "Varies by insurance/service", distanceHome: "~2.2 miles", walkingTime: "~45 min", bikingTime: "~11 min", transitTime: "~18 min", details: { "Why Go": "For medical issues that need prompt attention when the Tang Center is closed.", "Best For": "Non-life-threatening issues like sprains, fevers, cuts, and infections.", "Good to Know": "You can book appointments online, which usually saves time." }, mapQuery: "Carbon+Health,+2500+Shattuck+Ave,+Berkeley,+CA", icon: '⏱️' },
+                    { name: "Alta Bates - Herrick Campus (ER)", onCampus: false, pricing: "Varies by insurance/service", distanceHome: "~2.3 miles", walkingTime: "~48 min", bikingTime: "~12 min", transitTime: "~20 min", details: { "Why Go": "For severe, life-threatening medical emergencies ONLY.", "Best For": "Things like severe bleeding, difficulty breathing, or chest pain.", "Good to Know": "This is the closest emergency room to the UC Berkeley campus. For emergencies, always call 911." }, mapQuery: "Alta+Bates+Summit+Medical+Center+Herrick+Campus,+2001+Dwight+Way,+Berkeley,+CA", icon: '🚑' }
+                ]
+            },
+            "Groceries": {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400"><path d="M2.25 2.25a.75.75 0 0 0 0 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 0 0-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 0 0 0-1.5H5.378A2.25 2.25 0 0 1 7.5 15h11.218a.75.75 0 0 0 .674-.421 60.358 60.358 0 0 0 2.46-5.23a1.5 1.5 0 0 0-.673-1.922l-10.706-4.46a.75.75 0 0 0-.573.122Z" /></svg>`,
+                locations: [
+                    { name: "Berkeley Bowl Marketplace", onCampus: false, pricing: "Budget-to-Mid", distanceHome: "~0.8 miles", walkingTime: "~15 min", bikingTime: "~5 min", transitTime: "~10 min", details: { "Why Go": "For the unparalleled produce selection and vibrant, only-in-Berkeley atmosphere.", "Best For": "The produce section is legendary for its variety, quality, and price. Also great for bulk bins, high-quality meat and seafood.", "What Not to Go For": "A quick, calm shopping trip. It's famously crowded and can be overwhelming." }, mapQuery: "Berkeley+Bowl+Marketplace,+2020+Oregon+St,+Berkeley,+CA", icon: '🍎' },
+                    { name: "Safeway", onCampus: false, pricing: "Mid-to-High (Good with sales)", distanceHome: "~1.2 miles", walkingTime: "~25 min", bikingTime: "~7 min", transitTime: "~15 min", details: { "Why Go": "For a reliable, one-stop shop for all major brand-name items and weekly sales.", "Best For": "Weekly sales on pantry staples, snacks, and household items using their loyalty card.", "What Not to Go For": "The most exciting or diverse produce selection." }, mapQuery: "Safeway,+5100+Broadway,+Oakland,+CA", icon: '🛒' },
+                    { name: "Trader Joe's", onCampus: false, pricing: "Budget-Friendly", distanceHome: "~1.3 miles", walkingTime: "~28 min", bikingTime: "~8 min", transitTime: "~15 min", details: { "Why Go": "For unique, affordable house-brand products and a fun shopping experience.", "Best For": "The frozen food section, snacks, cheese, wine, and interesting pantry items you won't find anywhere else.", "What Not to Go For": "A full weekly grocery haul if you need a wide variety of fresh produce." }, mapQuery: "Trader+Joe's,+5700+Christie+Ave,+Emeryville,+CA", icon: '🌺' },
+                    { name: "Grocery Outlet Bargain Market", onCampus: false, pricing: "Deeply Discounted", distanceHome: "~0.9 miles", walkingTime: "~18 min", bikingTime: "~5 min", transitTime: "~12 min", details: { "Why Go": "To save money by bargain hunting. It's a treasure hunt for discounted brand-name goods.", "Best For": "Pantry stocking on a budget. Great deals on wine, cheese, and organic snacks.", "What Not to Go For": "Specific items on a shopping list, as the inventory is opportunistic and changes constantly." }, mapQuery: "Grocery+Outlet,+3264+Adeline+St,+Berkeley,+CA", icon: '🤑' }
+                ]
+            },
+            "Shopping": {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-purple-400"><path d="M15.75 2.25a.75.75 0 0 0-1.5 0v1.5h-3v-1.5a.75.75 0 0 0-1.5 0v1.5H8.25v-1.5a.75.75 0 0 0-1.5 0v1.5H3.75a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h16.5a3 3 0 0 0 3-3V6.75a3 3 0 0 0-3-3h-2.25v-1.5Z" /></svg>`,
+                locations: [
+                    { name: "Shops on Telegraph Avenue", onCampus: true, pricing: "Varies", distanceHome: "~1.6 miles", walkingTime: "~35 min", bikingTime: "~9 min", transitTime: "~20 min", details: { "Why Go": "To experience an iconic Berkeley street with a huge variety of unique shops.", "Best For": "Clothing stores (vintage to streetwear), bookstores, and record stores like Amoeba Music.", "Good to Know": "It's a vibrant, bustling area that's great for browsing and people-watching." }, mapQuery: "Telegraph+Ave,+Berkeley,+CA", icon: '🎓' },
+                    { name: "Goodwill", onCampus: false, pricing: "Very Low", distanceHome: "~1.9 miles", walkingTime: "~40 min", bikingTime: "~10 min", transitTime: "~15 min", details: { "Why Go": "For the classic treasure-hunt thrift experience.", "Best For": "Everyday clothing staples, cheap books, and basic kitchen items like plates and glasses.", "Good to Know": "Inventory changes daily, so it's worth checking back often." }, mapQuery: "Goodwill,+2058+University+Ave,+Berkeley,+CA", icon: '👕' },
+                    { name: "Urban Ore", onCampus: false, pricing: "Low-to-Mid", distanceHome: "~1.8 miles", walkingTime: "~38 min", bikingTime: "~10 min", transitTime: "~20 min", details: { "Why Go": "To find unique and affordable items for your apartment.", "Best For": "Salvaged furniture (desks, chairs, shelves), lamps, art, and supplies for DIY projects.", "Good to Know": "It's a massive warehouse, so give yourself plenty of time to explore." }, mapQuery: "Urban+Ore,+900+Murray+St,+Berkeley,+CA", icon: '🛋️' },
+                    { name: "Crossroads Trading", onCampus: false, pricing: "Mid-Range", distanceHome: "~1.3 miles", walkingTime: "~28 min", bikingTime: "~8 min", transitTime: "~15 min", details: { "Why Go": "To buy, sell, or trade trendy, in-style clothing.", "Best For": "Upgrading your wardrobe with stylish, modern pieces from brands like Madewell or J.Crew at a significant discount.", "Good to Know": "The Rockridge location on College Ave is known for having a great selection." }, mapQuery: "Crossroads+Trading,+5901+College+Ave,+Oakland,+CA", icon: '✨' }
+                ]
+            },
+            "Cheap Eats": {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-orange-400"><path d="M19.5 21a3 3 0 0 0 3-3v-1.5a3 3 0 0 0-3-3h-1.5a3 3 0 0 0-3 3V18a3 3 0 0 0 3 3h1.5ZM4.5 21a3 3 0 0 1-3-3v-1.5a3 3 0 0 1 3-3h1.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3H4.5Zm6.22-18a.75.75 0 0 0-1.44 0l-1.25 5.007a.75.75 0 0 0 .74.863h3.42a.75.75 0 0 0 .74-.863L10.72 3Z" /></svg>`,
+                locations: [
+                    { name: "Top Dog", onCampus: true, pricing: "Very Cheap", distanceHome: "~1.6 miles", walkingTime: "~35 min", bikingTime: "~9 min", transitTime: "~20 min", details: { "Why Go": "For a quick, cheap, and satisfying meal at a Berkeley institution.", "Best For": "Delicious, high-quality hot dogs with a huge variety of options.", "Good to Know": "It's a go-to spot for students and is open late." }, mapQuery: "Top+Dog,+2534+Durant+Ave,+Berkeley,+CA", icon: '🌭' },
+                    { name: "Artichoke Basille's Pizza", onCampus: true, pricing: "Cheap", distanceHome: "~1.5 miles", walkingTime: "~33 min", bikingTime: "~8 min", transitTime: "~18 min", details: { "Why Go": "For a huge, filling slice of pizza that's a meal in itself.", "Best For": "The signature creamy artichoke slice. It's the perfect late-night food.", "Good to Know": "One slice is probably enough!" }, mapQuery: "Artichoke+Basille's+Pizza,+2590+Durant+Ave,+Berkeley,+CA", icon: '🍕' },
+                    { name: "Mezzo", onCampus: true, pricing: "Cheap-to-Mid", distanceHome: "~1.6 miles", walkingTime: "~35 min", bikingTime: "~9 min", transitTime: "~20 min", details: { "Why Go": "For legendary portions that offer incredible value.", "Best For": "Enormous salads and sandwiches on their famous homemade honey wheat bread.", "Good to Know": "A single salad or sandwich can easily feed two people or provide lunch for two days." }, mapQuery: "Mezzo,+2442+Telegraph+Ave,+Berkeley,+CA", icon: '🥗' },
+                    { name: "La Mission", onCampus: false, pricing: "Cheap", distanceHome: "~1.8 miles", walkingTime: "~38 min", bikingTime: "~10 min", transitTime: "~15 min", details: { "Why Go": "For a massive, high-quality burrito that will last for two meals.", "Best For": "Their 'Super' burritos are packed with ingredients and flavor.", "Good to Know": "It's a no-frills spot that's beloved by locals for its consistency and value." }, mapQuery: "La+Mission,+1255+University+Ave,+Berkeley,+CA", icon: '🌯' },
+                    { name: "The Vault Cafe", onCampus: false, pricing: "Cheap", distanceHome: "~0.2 miles", walkingTime: "~5 min", bikingTime: "~2 min", transitTime: "~5 min", details: { "Why Go": "For a classic, affordable American breakfast or lunch right in your neighborhood.", "Best For": "Big breakfast plates, burgers, and fries.", "Good to Know": "It's the closest and most convenient option on this list for a sit-down meal." }, mapQuery: "The+Vault+Cafe,+3250+Adeline+St,+Berkeley,+CA", icon: '🍳' }
+                ]
+            }
+        };
+
+        const navButtonsContainer = document.getElementById('nav-buttons');
+        const mainContentContainer = document.getElementById('main-content');
+        let activeNavButton = null;
+        let activePage = null;
+
+        function initializeGuide() {
+            Object.keys(guideData).forEach((category, index) => {
+                const pageId = category.replace(/ & /g, '_').replace(/ /g, '_');
+                
+                const button = document.createElement('button');
+                button.className = 'nav-button px-3 py-2 md:px-4 text-sm md:text-base font-semibold rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center';
+                button.innerHTML = `${guideData[category].icon} <span class="hidden sm:inline">${category}</span>`;
+                button.dataset.page = pageId;
+                button.onclick = () => showPage(category);
+                navButtonsContainer.appendChild(button);
+
+                const page = document.createElement('div');
+                page.id = pageId;
+                page.className = 'page bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8';
+                page.innerHTML = createPageHTML(category);
+                mainContentContainer.appendChild(page);
+
+                page.querySelectorAll('.location-card').forEach(card => {
+                    card.onclick = () => {
+                        page.querySelectorAll('.location-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        displayLocationInfo(category, card.dataset.locationName);
+                    };
+                });
+
+                if (index === 0) {
+                    showPage(category);
+                    const firstLocationName = guideData[category].locations[0].name;
+                    const firstCard = page.querySelector(`.location-card[data-location-name="${firstLocationName}"]`);
+                    if(firstCard) {
+                        firstCard.classList.add('active');
+                        displayLocationInfo(category, firstLocationName);
+                    }
+                }
+            });
+        }
+
+        function createPageHTML(category) {
+            const { locations } = guideData[category];
+            const onCampusLocations = locations.filter(loc => loc.onCampus);
+            const offCampusLocations = locations.filter(loc => !loc.onCampus);
+
+            let locationsHTML = '';
+
+            const createCard = (loc) => `
+                <div class="location-card bg-gray-700 p-4 rounded-lg cursor-pointer border-l-4 border-transparent hover:bg-gray-600 transition duration-200 flex items-center" data-location-name="${loc.name}">
+                    <div class="location-card-icon text-2xl mr-4">${loc.icon || '📍'}</div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="font-bold text-lg text-white truncate">${loc.name}</h3>
+                        <p class="text-sm text-gray-400">${loc.distanceHome} | 🚲 ${loc.bikingTime}</p>
+                    </div>
+                </div>
+            `;
+
+            if (onCampusLocations.length > 0) {
+                locationsHTML += '<h2 class="text-xl font-semibold mb-3 text-white">On or Near Campus</h2><div class="space-y-3">';
+                onCampusLocations.forEach(loc => { locationsHTML += createCard(loc); });
+                locationsHTML += '</div>';
+            }
+
+            if (offCampusLocations.length > 0) {
+                locationsHTML += `<h2 class="text-xl font-semibold mt-6 mb-3 text-white">Off-Campus</h2><div class="space-y-3">`;
+                offCampusLocations.forEach(loc => { locationsHTML += createCard(loc); });
+                locationsHTML += '</div>';
+            }
+            
+            const sortedLocations = [...locations].sort((a, b) => {
+                const distA = parseFloat(a.distanceHome.replace('~','').replace(' miles',''));
+                const distB = parseFloat(b.distanceHome.replace('~','').replace(' miles',''));
+                return distA - distB;
+            });
+
+            let overviewMapUrl = `https://www.google.com/maps/dir/`;
+            overviewMapUrl += `${encodeURIComponent(homeAddress)}/`;
+            sortedLocations.forEach(loc => {
+                overviewMapUrl += `${encodeURIComponent(loc.name)},+${encodeURIComponent(loc.mapQuery)}/`;
+            });
+
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 h-96 lg:h-[700px] overflow-y-auto pr-2">
+                        ${locationsHTML}
+                    </div>
+                    <div id="${category}-info-wrapper" class="lg:col-span-2 min-h-[400px] lg:h-[700px] flex flex-col space-y-4 overflow-y-auto">
+                         <div id="${category}-info" class="flex-grow">
+                            <div class="flex items-center justify-center h-full text-gray-500 bg-gray-700 rounded-lg p-4 text-center">
+                                <p>Select a location from the list to see details and travel options.</p>
+                            </div>
+                        </div>
+                        <div id="${category}-overview-map">
+                             <h3 class="text-lg font-semibold text-white mb-2">Category Overview</h3>
+                             <a href="${overviewMapUrl}" target="_blank" rel="noopener noreferrer" class="block w-full h-48 rounded-lg shadow-lg border-2 border-gray-600 group relative bg-gray-800 flex flex-col items-center justify-center text-center p-4 hover:border-blue-400 transition">
+                                <svg class="w-12 h-12 text-green-400 mb-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.161 2.58a1.875 1.875 0 0 1 1.678 0l4.993 2.498c.446.222.768.69.768 1.21 V17.9c0 .52-.322.988-.768 1.21l-4.993 2.497a1.875 1.875 0 0 1-1.678 0l-4.993-2.497a1.875 1.875 0 0 1-.768-1.21V6.288c0-.52.322-.988.768-1.21L8.16 2.58ZM9 6a.75.75 0 0 1 .75.75V15a.75.75 0 0 1-1.5 0V6.75A.75.75 0 0 1 9 6Zm6 3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 15 9Z" clip-rule="evenodd" /></svg>
+                                <h4 class="font-semibold text-white">Overview for ${category}</h4>
+                                <p class="text-sm text-gray-400">(Click to see all on Google Maps)</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showPage(category) {
+            const pageId = category.replace(/ & /g, '_').replace(/ /g, '_');
+            
+            if (activeNavButton) {
+                activeNavButton.classList.remove('bg-blue-500', 'text-white', 'shadow-lg');
+                activeNavButton.classList.add('bg-gray-700', 'text-gray-300');
+            }
+            if (activePage) {
+                activePage.classList.remove('active');
+            }
+
+            const newButton = document.querySelector(`.nav-button[data-page="${pageId}"]`);
+            const newPage = document.getElementById(pageId);
+            
+            newButton.classList.add('bg-blue-500', 'text-white', 'shadow-lg');
+            newButton.classList.remove('bg-gray-700', 'text-gray-300');
+            newPage.classList.add('active');
+
+            activeNavButton = newButton;
+            activePage = newPage;
+        }
+
+        function displayLocationInfo(category, locationName) {
+            const location = guideData[category].locations.find(loc => loc.name === locationName);
+            if (!location) return;
+
+            const infoContainer = document.getElementById(`${category}-info`);
+            
+            const baseMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(homeAddress)}&destination=${encodeURIComponent(location.mapQuery)}`;
+            const walkingUrl = `${baseMapsUrl}&travelmode=walking`;
+            const bikingUrl = `${baseMapsUrl}&travelmode=bicycling`;
+            const transitUrl = `${baseMapsUrl}&travelmode=transit`;
+            
+            infoContainer.innerHTML = `
+                <div class="bg-gray-700 p-6 rounded-lg h-full flex flex-col">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">${location.name}</h2>
+                    
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-100 mb-2">Travel Estimates from Home</h3>
+                        <div class="flex justify-around items-center bg-gray-800 p-3 rounded-lg text-center">
+                            <a href="${walkingUrl}" target="_blank" class="flex-1 p-2 rounded-lg hover:bg-gray-600 transition">
+                                <span class="text-2xl">🚶</span>
+                                <p class="text-sm font-medium">${location.walkingTime}</p>
+                            </a>
+                            <a href="${bikingUrl}" target="_blank" class="flex-1 p-2 rounded-lg hover:bg-gray-600 transition">
+                                <span class="text-2xl">🚲</span>
+                                <p class="text-sm font-medium">${location.bikingTime}</p>
+                            </a>
+                            <a href="${transitUrl}" target="_blank" class="flex-1 p-2 rounded-lg hover:bg-gray-600 transition">
+                                <span class="text-2xl">🚌</span>
+                                <p class="text-sm font-medium">${location.transitTime}</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 text-base text-gray-300 flex-grow">
+                        ${Object.entries(location.details).map(([key, value]) => `
+                            <div>
+                                <h4 class="font-semibold text-gray-100">${key}</h4>
+                                <p>${value}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeGuide);
+    </script>
+</body>
+</html>
